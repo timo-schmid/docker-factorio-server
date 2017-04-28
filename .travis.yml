@@ -3,7 +3,7 @@ sudo: required
 services:
  - docker
 
-language: haskell
+language: generic
 
 #addons:
 #  apt:
