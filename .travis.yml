@@ -1,0 +1,29 @@
+sudo: required
+
+services:
+ - docker
+
+language: haskell
+
+ghc:
+  - 8.2
+
+script:
+  - cabal configure && cabal build
+
+env:
+  global:
+  - secure: CsE3JBP3LvgTd/yIkCU4eGcA7BsPz/ld+F8zWc+87CueqoPT6BOTIAAJ0RvfwfccuQlakxLAxdGDNXn/S8p6opT5/6cptMAihAgBlvoHt3rQ6E/EMfkRYrD4JlogYnUhB6zYuJF9HnQs9QuNMBtUcYQI9pNPVfI9ic1KIMAaoMgaIWQ+HW4XOrNLB6SB56aBZKs2A6UNyD03lAEi89BFuNbx2rFNn4xd0bavo6PHO2gUA1lRbgug/oznA5dulzPqyO6BH28DcXW6VVFMA0PTKMCNGGs7X6jeg0za/QonH4rTYeGIy5JQHJGxABzoXUN0Dm1iNiAXF39vv69meDvpDTSX2UeXbiRNrhp4hKxV5KYWpvUcUF0YUBxioRZvV9KZCzwnr2ddq2IdrlxYSph96tIThhRzvrJaQx9ghI/3gbftcH+z5E9x8TS2J4hZJ+29MmcLwRguhCqksqHg4fORYPgNuKUJaMuSWOx4f776JUxdB29aSLTdC2KQQEid+vBVIUl0d00x/Ru535AL3mThL0IZ2qUWNNqyQ5lRvfK8+bqYbTJKLSl882O/6An+Eb/G1YURLc/wwE4xSGesbOq81krg3jQhnAprkgy0kwODOl8Gom6Q+LwCaqBKK68jHLwbH177ybRL82u1SOG0AyLA8RFkazB5jg9IknJlB9ustRc=
+  - secure: kGznckyFolm2XNgN+Ed6gPn0f0QTP/SygT2vZwluL/J0VxEEMcJEMOhNnQBX9eI4bUrffpas4drj1+Ys4VXekYsNRcGdktxQTFs6CNcWFn8LrOvEYQe/mdMI/jY8BhXAbO2iLbYHYvZimuPQ41raktQCdFsYtfylYuchCnByS25R8CMTgyUb5nlVV4C5UOnEL4DT05VcNABMkRFKmz7uvrWovZoKoBACb1kKZmD/T5YA8hvXvUkVtmscvpzrhX9o+orhfx0j0GPv04IxnuuoY3Vm2o/dvYTXpMN23u4zeRiScVnuuncDJGqL6uC025uk31flK3mOTGIZymc+v7b2avXr9yVM3kHHNw3VryHw/tCw1hwu25MVEC/mBkZRLQ42oQjlD/MDAL9/CdBqlCDgtVKhw321Kax19IdqxuH+UwfCRTqwYGn1c9yEm7pEJKP2QdpU/DTtwZTgwO2Ni4sOVldo8TQKPGI2AczwNMgWN8B1oRkIhHQi3abtLwiGQSyYzzwBrW/BsZyIWewVjwi2nwiUKKYlHo3gAm95il44MZWAvLHTXEvLzUNfmzkq2+vSS+NXk/zUGziJ1fxO5hhQIVU+t9+svdN44jFAWT0QuugSWJ92RQABYmftdKbOmzPQOi/FaZOQhFO/oN7IJqn1WLRJHUO2TeU9CpQUmPoFyOA=
+  - secure: C8MgvLIZKNhUQ0Dn7ZYvJ24Gqu1O7ndkqNZyGd/K1A626fek+gaG1Mzjc6R0nlgkh21PnjLDgiSKfFLZw34NGlTLuEDYU62lrAEQiTU5JxM3F/bg8rVGrHUYnu4z/dQp16szqIrw03kzFX5a+HEck6BogeYUHdrxRjME04UTkM34lBu+q/dEdGfwwgdqURsAoT4vehRnZkmFk2T+YEMrPg63gkrXVHbC4X2JLOdOpvgXG0MzScS+V2/2TvFg4w3I27t9XYYTTCd70mjt8ZkkkbmkgTGhWwP0dYa6QKuGf2kMl2bxhSlf5bnL+qA7qckfFuVwlDBxDzEYyDPSJZAuhif6fmBnPSCiJA/nO0RPh+C7iDMVAStaOAa6jaG+H37wTvwRy4pG4GLI/EbGFZzpoDMG1ElBZ12VDeJNjB6Br5pSYFGMT+8mtSOzuL0nuABUM40lyp8jFHVirSqPP9uD/IRx9uHnSYG+VAEB4U/VwrCNnmoIhVf+GU88f4MeoSbHMDaNqL9ohQR1h5Lz8WpCVvkov2B5YUnzZKWZgLAjaUSLVBjCdw9Q/DQLgg+YLUSVUGp5Ao16F/CkOdNKXEsO5Pb1oinhvNd5CSteWWr5Hd9kflQf6NoZejiDLppu+3VMXSKlt+Olba7c3dlvXwmBfRzTHjfp3FPR29XeNGV3nUc=
+  - COMMIT=${TRAVIS_COMMIT::8}
+
+after_success:
+  - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
+  - export REPO=timoschmid/docker-factorio-server
+  - export TAG=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "latest"; else echo $TRAVIS_BRANCH ; fi`
+  - docker build -f Dockerfile -t $REPO:$COMMIT .
+  - docker tag $REPO:$COMMIT $REPO:$TAG
+  - docker tag $REPO:$COMMIT $REPO:travis-$TRAVIS_BUILD_NUMBER
+  - docker push $REPO
+
