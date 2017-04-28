@@ -6,7 +6,7 @@ services:
 language: haskell
 
 ghc:
-  - 8.2
+  - 8.0.2
 
 script:
   - cabal configure && cabal build
