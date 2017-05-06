@@ -4,7 +4,7 @@ FROM frolvlad/alpine-glibc:alpine-3.5_glibc-2.25
 RUN mkdir -p /opt/startorio /opt/factorio
 
 # Set the version
-RUN echo "0.15.9" >> /opt/factorio/factorio.version
+RUN echo "0.15.8" >> /opt/factorio/factorio.version
 
 # set the directory for the build
 WORKDIR /opt/startorio
